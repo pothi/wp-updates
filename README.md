@@ -1,2 +1,2 @@
 # wp-updates
-Scripts to update and log WordPress minor core updates and plugin updates
+Scripts to initiate and log WordPress minor core updates and plugin updates
