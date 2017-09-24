@@ -1,0 +1,5 @@
+# WP minor core updates - run every 4 hours
+7	*/4	*	*	*	~/scripts/wp-core-update-minor.sh example.com &> /dev/null
+
+# WP plugin updates - run once a week
+7	5	*	*	Tue	~/scripts/wp-plugin-update-all.sh example.com &> /dev/null
