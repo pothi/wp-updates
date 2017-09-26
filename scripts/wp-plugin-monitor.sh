@@ -27,6 +27,7 @@ echo $timestamp
 declare -r plugins_status_log=${HOME}/log/wp-plugin-status-${datestamp}.log
 declare -r plugins_status_log_after_update=${HOME}/log/wp-plugin-status-after-update-${datestamp}.log
 declare -r plugins_update_log=${HOME}/log/plugin-update-${datestamp}.log
+declare -r tmp_log=${HOME}/log/tmp-wp-plugin-update.log
 update_plugins=false
 
 # usage info
@@ -97,15 +98,16 @@ sed -e '/installed plugins/ d' -e '/^Legend/ d' -e '/^$/ d' -e 's/^[[:space:]]\+
 
 if $update_plugins ; then
     echo 'Updating plugins...'
-    $wp_cli --no-color --quiet --path=${WP_PATH} plugin update --all > $plugins_update_log
-    if -s $plugins_update_log ; then
+    $wp_cli --no-color --quiet --path=${WP_PATH} plugin update --all > $tmp_log
+    if [ -s $tmp_log ] ; then
+        mv $tmp_log $plugins_update_log
         $wp_cli --no-color --quiet --path=${WP_PATH} plugin status > $plugins_status_log_after_update
         # normalize the log - see the first usage above for details
         sed -e '/installed plugins/ d' -e '/^Legend/ d' -e '/^$/ d' -e 's/^[[:space:]]\+//g' -i $plugins_status_log_after_update
 
         echo 'done.'
     else
-        rm $plugins_update_log
+        rm $tmp_log
         echo 'Nothing to update...'
     fi
 fi
