@@ -88,6 +88,7 @@ fi
 
 $wp_cli --no-color --quiet --path=${WP_PATH} plugin status > $plugins_status_log
 
+### normalize the log
 # remove the line "n installed plugins"
 # remove the line starts with Legend
 # remove the empty line/s
@@ -97,8 +98,16 @@ sed -e '/installed plugins/ d' -e '/^Legend/ d' -e '/^$/ d' -e 's/^[[:space:]]\+
 if $update_plugins ; then
     echo 'Updating plugins...'
     $wp_cli --no-color --quiet --path=${WP_PATH} plugin update --all > $plugins_update_log
-    $wp_cli --no-color --quiet --path=${WP_PATH} plugin status > $plugins_status_log_after_update
-    echo 'done.'
+    if -s $plugins_update_log ; then
+        $wp_cli --no-color --quiet --path=${WP_PATH} plugin status > $plugins_status_log_after_update
+        # normalize the log - see the first usage above for details
+        sed -e '/installed plugins/ d' -e '/^Legend/ d' -e '/^$/ d' -e 's/^[[:space:]]\+//g' -i $plugins_status_log_after_update
+
+        echo 'done.'
+    else
+        rm $plugins_update_log
+        echo 'Nothing to update...'
+    fi
 fi
 
 if [ "$?" != "0" ]; then
